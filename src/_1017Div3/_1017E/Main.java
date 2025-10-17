@@ -1,79 +1,83 @@
 package _1017Div3._1017E;
 
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static StringTokenizer st;
-    static PrintWriter pw = new PrintWriter(System.out);
-
-    public static void main(String[] args) throws IOException {
-        int t = Integer.parseInt(br.readLine());
-        while (t-- > 0) {
-            st = new StringTokenizer(br.readLine());
-            int n = Integer.parseInt(st.nextToken());
-            int k = Integer.parseInt(st.nextToken());
-            int[] a = new int[n];
-            st = new StringTokenizer(br.readLine());
-            for (int i = 0; i < n; i++) {
-                a[i] = Integer.parseInt(st.nextToken());
-            }
-            solve(n, k, a);
+    static void print(List<Long> c, long k) {
+        int cnt = 0;
+        while (k-- > 0) {
+            System.out.print(c.get(cnt) + " ");
+            cnt++;
+            cnt %= c.size();
         }
-        pw.close();
+        System.out.println();
     }
 
-    static void solve(int n, int k, int[] a) {
-        boolean[] appeared = new boolean[n + 1];
-        for (int num : a) {
-            appeared[num] = true;
-        }
-        List<Integer> candidateList = new ArrayList<>();
+    static void solve(BufferedReader br, PrintWriter out) throws IOException {
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        long n = Long.parseLong(st.nextToken());
+        long k = Long.parseLong(st.nextToken());
+
+        st = new StringTokenizer(br.readLine());
+        long[] a = new long[(int)(n + 1)];
+        long[] b = new long[(int)(n + 1)];
+        List<Long> c = new ArrayList<>();
+
         for (int i = 1; i <= n; i++) {
-            if (!appeared[i]) {
-                candidateList.add(i);
-            }
-        }
-        if (candidateList.isEmpty()) {
-            for (int i = 1; i <= n; i++) {
-                candidateList.add(i);
-            }
+            a[i] = Long.parseLong(st.nextToken());
+            b[(int)a[i]]++;
         }
 
-        int last1 = a[n - 1];
-        int last2 = a[n - 2];
-        List<Integer> res = new ArrayList<>();
-        int prev1 = last1;
-        int prev2 = last2;
-        for (int i = 0; i < k; i++) {
-            int chosen = -1;
-            for (int cand : candidateList) {
-                if (cand != prev1 && cand != prev2) {
-                    chosen = cand;
-                    break;
-                }
-            }
-            if (chosen == -1) {
-                for (int cand : candidateList) {
-                    if (cand != prev1) {
-                        chosen = cand;
-                        break;
-                    }
-                }
-                if (chosen == -1) {
-                    chosen = candidateList.get(0);
-                }
-            }
-            res.add(chosen);
-            prev2 = prev1;
-            prev1 = chosen;
+        for (int i = 1; i <= n; i++) {
+            if (b[i] == 0) c.add((long)i);
         }
 
-        for (int i = 0; i < k; i++) {
-            pw.print(res.get(i));
-            if (i < k - 1) pw.print(" ");
+        if (c.size() == 0) {
+            c.add(a[(int)n - 2]);
+            c.add(a[(int)n - 1]);
+            c.add(a[(int)n]);
+            print(c, k);
         }
-        pw.println();
+        else if (c.size() == 1) {
+            if (a[(int)n - 1] == a[(int)n]) c.add(a[(int)n - 2]);
+            else c.add(a[(int)n - 1]);
+            c.add(a[(int)n]);
+            if (k >= 1) {
+                k--;
+                System.out.print(c.get(0) + " ");
+            }
+            Collections.swap(c, 0, 1);
+            Collections.swap(c, 1, 2);
+            print(c, k);
+        }
+        else if (c.size() == 2) {
+            c.add(a[(int)n]);
+            if (k >= 2) {
+                k -= 2;
+                System.out.print(c.get(0) + " " + c.get(1) + " ");
+            } else {
+                System.out.println(c.get(0));
+            }
+            Collections.swap(c, 0, 2);
+            Collections.swap(c, 1, 2);
+            print(c, k);
+        }
+        else {
+            print(c, k);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out);
+
+        int T = Integer.parseInt(br.readLine());
+        while (T-- > 0) {
+            solve(br, out);
+        }
+
+        out.flush();
+        out.close();
     }
 }
